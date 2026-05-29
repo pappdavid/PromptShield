@@ -1,0 +1,54 @@
+{
+  "name": "agentsec-suite",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate deploy",
+    "db:generate": "node scripts/ci/prisma-generate.mjs",
+    "db:generate:ci": "node scripts/ci/prisma-generate.mjs",
+    "db:seed": "npx tsx prisma/seed.ts",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:migrate:status": "prisma migrate status",
+    "db:migrate:reset": "prisma migrate reset"
+  },
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@clerk/nextjs": "^5.7.5",
+    "@crayonai/react-core": "^0.7.7",
+    "@crayonai/react-ui": "^0.9.16",
+    "@crayonai/stream": "^0.6.4",
+    "@paralleldrive/cuid2": "^3.3.0",
+    "@prisma/client": "^6.2.1",
+    "@thesysai/genui-sdk": "^0.10.0",
+    "date-fns": "^4.3.0",
+    "lucide-react": "0.562.0",
+    "next": "^14.2.22",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^6.0.2",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^14.2.22",
+    "postcss": "^8.4.49",
+    "prisma": "^6.2.1",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.7"
+  }
+}

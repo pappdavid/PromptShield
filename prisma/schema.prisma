@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Core user model
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  apiKeys  ApiKey[]
+  scanLogs ScanLog[]
+  mcpScans           McpScan[]
+  agentRecords       AgentRecord[]
+  agentEvents        AgentEvent[]
+  submittedApprovals ApprovalRequest[] @relation("Submitter")
+  decidedApprovals   ApprovalRequest[] @relation("Decider")
+  generatedBriefs    GeneratedBrief[]
+  artifactReports    ArtifactReport[]
+}
+
+// API keys for programmatic access
+model ApiKey {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  key       String   @unique
+  lastUsed  DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// Prompt scan history
+model ScanLog {
+  id               String   @id @default(cuid())
+  userId           String
+  input            String
+  safe             Boolean
+  detectedPatterns String[] @default([])
+  aiAnalysis       String?
+  severity         String   @default("low")
+  createdAt        DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model McpScan {
+  id          String   @id @default(cuid())
+  userId      String
+  rawInput    String
+  toolCount   Int      @default(0)
+  overallRisk String   @default("low")
+  findings    Json     @default("[]")
+  summary     String   @default("")
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model AgentRecord {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  agentType   String   @default("REST")
+  status      String   @default("active")
+  endpoint    String?
+  environment String?
+  permissions String[]
+  tools       String[]
+  metadata    Json?
+  riskScore   Int?
+  riskLevel   String?
+  riskReasons String[]
+  readiness   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  events      AgentEvent[]
+  @@index([userId])
+}
+
+model AgentEvent {
+  id          String       @id @default(cuid())
+  userId      String
+  agentId     String?
+  eventType   String
+  severity    String
+  description String
+  metadata    Json?
+  createdAt   DateTime     @default(now())
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  agent       AgentRecord? @relation(fields: [agentId], references: [id], onDelete: SetNull)
+  @@index([userId])
+  @@index([agentId])
+}
+
+model ApprovalRequest {
+  id            String               @id @default(cuid())
+  submittedById String
+  decidedById   String?
+  title         String
+  description   String?
+  riskLevel     String               @default("low")
+  riskReasons   String[]
+  riskSummary   String?
+  status        String               @default("pending")
+  decisionNote  String?
+  decidedAt     DateTime?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  submittedBy   User                 @relation("Submitter", fields: [submittedById], references: [id], onDelete: Cascade)
+  decidedBy     User?                @relation("Decider", fields: [decidedById], references: [id], onDelete: SetNull)
+  auditEvents   ApprovalAuditEvent[]
+  @@index([submittedById])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ApprovalAuditEvent {
+  id                String          @id @default(cuid())
+  approvalRequestId String
+  eventType         String
+  actorId           String?
+  note              String?
+  metadata          Json?
+  createdAt         DateTime        @default(now())
+  approvalRequest   ApprovalRequest @relation(fields: [approvalRequestId], references: [id], onDelete: Cascade)
+  @@index([approvalRequestId])
+  @@index([createdAt])
+}
+
+model GeneratedBrief {
+  id          String   @id @default(cuid())
+  userId      String
+  module      String
+  sourceId    String
+  c1Response  String   @db.Text
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@index([module, sourceId])
+}
+
+model ArtifactReport {
+  id           String   @id @default(cuid())
+  userId       String
+  module       String
+  sourceIds    String[]
+  artifactType String
+  title        String
+  c1Artifact   String   @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@index([module])
+}

@@ -39,6 +39,7 @@ describe("scanPrompt", () => {
         category: finding.category,
         title: finding.title,
         severity: finding.severity,
+        evidence: finding.evidence,
       })),
     });
   });

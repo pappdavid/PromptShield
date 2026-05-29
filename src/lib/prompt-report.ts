@@ -25,7 +25,7 @@ export interface PromptScanReport {
 export interface PromptReportAnalysis {
   summary: string;
   remediation: string[];
-  findings: Array<Pick<PromptFinding, "category" | "title" | "severity">>;
+  findings: Array<Pick<PromptFinding, "category" | "title" | "severity" | "evidence">>;
 }
 
 export interface PromptScanResponse extends PromptScanReport {
@@ -153,6 +153,7 @@ export function buildPromptReportAnalysis(report: PromptScanReport): PromptRepor
       category: finding.category,
       title: finding.title,
       severity: finding.severity,
+      evidence: finding.evidence,
     })),
   };
 }

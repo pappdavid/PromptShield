@@ -81,9 +81,18 @@ function combinedText(action: RuntimeAction) {
     .join(" ");
 }
 
+function actionTextFields(action: RuntimeAction) {
+  return [action.command, action.description].filter(
+    (value): value is string => typeof value === "string" && value.trim().length > 0
+  );
+}
+
 export function inspectRuntimeAction(action: RuntimeAction): RuntimeInspectionResult {
   const text = combinedText(action);
-  const destructive = destructivePatterns.find(({ pattern }) => pattern.test(text));
+  const fields = actionTextFields(action);
+  const destructive = destructivePatterns.find(({ pattern }) =>
+    fields.some((field) => pattern.test(field))
+  );
 
   if (destructive) {
     return {

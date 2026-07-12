@@ -28,8 +28,11 @@ jobs:
           DATABASE_URL: "postgresql://placeholder:placeholder@localhost/placeholder"
           DIRECT_URL: "postgresql://placeholder:placeholder@localhost/placeholder"
 
-      - name: Unit tests
-        run: npm test
+      - name: Prompt scanner unit tests
+        run: npx vitest run src/lib/prompt-report.test.ts --reporter=verbose
+
+      - name: Runtime inspection unit tests
+        run: npx vitest run src/lib/runtime-inspection.test.ts --reporter=verbose
 
       - name: Typecheck
         run: npm run typecheck

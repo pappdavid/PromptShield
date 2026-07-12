@@ -76,7 +76,10 @@ const RULES: Array<{
     category: "data_exfiltration",
     title: "Data exfiltration request",
     severity: "critical",
-    patterns: [/secrets?/i, /api keys?/i, /passwords?/i, /tokens?/i, /https?:\/\/[^\s]+/i, /webhook/i],
+    patterns: [
+      /\b(?:reveal|show|print|return|send|upload|post|forward|exfiltrate|leak|steal|extract)\b.{0,100}\b(?:secrets?|api keys?|passwords?|access tokens?|credentials?)\b/i,
+      /\b(?:secrets?|api keys?|passwords?|access tokens?|credentials?)\b.{0,100}\b(?:send|upload|post|forward|to|via)\b.{0,80}(?:https?:\/\/\S+|webhook)/i,
+    ],
     remediation: "Block outbound data transfer instructions and require allowlisted destinations for agent outputs.",
   },
   {
